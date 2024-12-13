@@ -27,24 +27,12 @@ warnings.filterwarnings("ignore")
 emissions = pd.read_csv("data/co2_cons.csv")
 ```
 
-
-```{python}
-emissions.query("country == 'China'")[["country",  "2020", "2021", "2022"]]
-```
-
-
 ```{python}
 for col in ["2021", "2022"]:
     has_k = emissions[col].str.contains("k")
     values = emissions[col].str.replace("k", "")
     emissions[col] = np.where(has_k, values.astype(float) * 1000, values.astype(float))
 ```
-
-
-```{python}
-emissions.query("country == 'China'")[["country",  "2020", "2021", "2022"]]
-```
-
 
 ```{python}
 
@@ -60,10 +48,6 @@ table_df["Relative Change"] = table_df["Relative Change"] = ((table_df["2022"] -
 # Round to 0 decimal places, and add a % sign to the relative change
 table_df["Relative Change"] = table_df["Relative Change"].round(0).astype(str) + "%"
 
-```
-
-```{python}
-show(table_df)
 ```
 
 
@@ -100,10 +84,6 @@ fig_chart = px.line(
     },
     template="plotly"
 )
-
-# Display the chart
-fig_chart.show()
-
 ```
 
 
@@ -122,8 +102,6 @@ fig_map = px.choropleth(
     animation_frame="year",
     title="Global CO2 Emissions (1990-2022)",
 )
-
-fig_map.show()
 ```
 
 ::: {.panel-tabset}

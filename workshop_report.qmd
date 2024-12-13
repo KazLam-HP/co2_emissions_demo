@@ -1,35 +1,11 @@
 ---
-title: "Workshop Exercise: Emissions Data - Table, Map, and Chart"
+title: "CO2 Emissions Report"
+author: "Kazim Lamine"
 format: html
+execute:
+  warning: false
+  echo: false
 ---
-
-# Introduction
-
-In this exercise, you will work with a CO2 emissions dataset downloaded from Gapminder and produce a report with three tabs: a data table, a line chart, and a choropleth map. 
-
-The goal is to roughly replicate the [Our World in Data visualization page on consumption-based CO<sub>2</sub> emissions](https://ourworldindata.org/grapher/consumption-co2-emissions?tab=table&time=2000..2022).
-
-Be sure to view that page to get an idea of the final product.
-
-# Setup
-
-- You should have forked and cloned this repository to your local machine.
-
-- Now, create and select a virtual environment in VSCode.
-
-- Install the following packages: 
-  - pandas
-  - plotly
-  - itables
-  - ipykernel
-  - jupyter
-  - country_converter
-
-- Download the data from [Gapminder](https://www.gapminder.org/data/) by selecting: *Environment > Emissions > CO2 Total emissions*, then downloading the CSV file into a `data` folder in your repository.
-
-# Data Import
-
-Run the following code to import the necessary libraries:
 
 ```{python}
 import pandas as pd
@@ -37,28 +13,25 @@ import numpy as np
 import plotly.express as px
 from itables import show
 import country_converter as coco
+from IPython.display import HTML
 ```
 
-Load in your dataset from gapminder below. View it in your data viewer to get an idea of the structure.
+```{python}
+import warnings
+# Ignoring all warnings
+warnings.filterwarnings("ignore")
+```
 
 ```{python}
 # Load the data
 emissions = pd.read_csv("data/co2_cons.csv")
 ```
 
-# Initial Cleaning
-
-In this dataset, some values are given in thousands, with a "k" used to represent the thousands. This will cause problems when we try to make these columns numeric. So we need to clean this. We'll do this for you, but pay close attention as you might need it for your final project.
-
-First, let's see the issue:
 
 ```{python}
 emissions.query("country == 'China'")[["country",  "2020", "2021", "2022"]]
 ```
 
-Notice the letter "k" at the end of "10.6k" as an example.
-
-We can remove the "k" and multiply those values by 1000 with the following code:
 
 ```{python}
 for col in ["2021", "2022"]:
@@ -67,22 +40,14 @@ for col in ["2021", "2022"]:
     emissions[col] = np.where(has_k, values.astype(float) * 1000, values.astype(float))
 ```
 
-And check that it worked:
 
 ```{python}
 emissions.query("country == 'China'")[["country",  "2020", "2021", "2022"]]
 ```
 
 
-# Table Section
-
-Our goal is to create a table showing emissions for a few selected years and calculate absolute and relative changes.
-
-1. Subset the data to include `Country`, `2000`, and `2022` columns only.
-2. Calculate an "Absolute Change" column (`emissions_2022 - emissions_2000`).
-3. Calculate a "Relative Change" column (`(emissions_2022 - emissions_2000) / emissions_2000`).
-
 ```{python}
+
 # Subset the data to include `country`, `2000`, and `2022` columns only.
 table_df = emissions[['country', '2000', '2022']]
 
@@ -94,22 +59,13 @@ table_df["Relative Change"] = table_df["Relative Change"] = ((table_df["2022"] -
 
 # Round to 0 decimal places, and add a % sign to the relative change
 table_df["Relative Change"] = table_df["Relative Change"].round(0).astype(str) + "%"
-```
 
-Now we can display this as an interactive table with itables:
+```
 
 ```{python}
 show(table_df)
 ```
 
-# Chart Section
-
-Our goal is to create a line chart from 1990 to 2022 for a few selected countries.
-
-1. Melt the data so that years become rows.
-2. Filter from 1990 to 2022 only.
-3. Choose 5 countries of your choice.
-4. Create a line chart with Plotly Express.
 
 ```{python}
 # Melt the dataset. Your id_vars should be "country", your var_name should be "year" and your value_name should be "emissions".
@@ -151,15 +107,6 @@ fig_chart.show()
 ```
 
 
-# Mapping Section
-
-This part is done for you.
-
-**Goal:** Create a choropleth map showing global emissions from 1990 to 2022.  
-This will be animated by year.
-
-1. Ensure each country has a 3-letter ISO code. We'll use `country_converter` for that.
-2. Create a map with `px.choropleth` and use `animation_frame` to show changes over time.
 
 ```{python}
 # Convert country names to ISO3 codes
@@ -178,17 +125,6 @@ fig_map = px.choropleth(
 
 fig_map.show()
 ```
-
-
-# Final Tabset
-
-Below, we place our results into a tabbed interface.
-
----
-title: "CO2 Emissions Report"
-author: "Kazim Lamine"
-format: html
----
 
 ::: {.panel-tabset}
 
